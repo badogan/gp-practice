@@ -1,0 +1,34 @@
+{
+  "name": "gp-practice",
+  "version": "1.0.0",
+  "description": "BE to use as gp-practice BE",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "start:prod": "NODE_ENV=production nodemon server.js"
+  },
+  "author": "Basri Dogan",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.7",
+    "morgan": "^1.10.0",
+    "validator": "^13.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  }
+}
