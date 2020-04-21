@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from this IP, please try again in an hour!',
+  message: 'Too many requests from this IP, please try again in an hour!'
 });
 app.use('/api', limiter);
 
@@ -66,6 +66,18 @@ app.use((req, res, next) => {
   next();
 });
 
+const BasriLogger2 = (req, res) => {
+  console.log('Basri logger (req): ', Object.keys(req));
+};
+
+const BasriUtils = require('./utils/BasriUtils');
+//BASRI - Custom Middleware!
+//Simply logs/lists the keys of the req object :)
+app.use((req, res, next) => {
+  BasriUtils.BasriLogger(req, res);
+  next();
+});
+
 //Compression
 app.use(compression());
 
@@ -73,17 +85,18 @@ app.use(compression());
 const whitelist = [
   'http://localhost:3000',
   'http://example2.com',
-  'http://localhost:5000',
+  'http://localhost:5000'
 ];
 const corsOptions = {
-  origin: function (origin, callback) {
+  origin: function(origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new AppError('Not allowed by CORS'));
     }
-  },
+  }
 };
+
 app.use(cors());
 // app.use(cors(corsOptions));
 app.options('*', cors());

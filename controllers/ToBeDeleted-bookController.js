@@ -1,4 +1,4 @@
-const Book = require('../models/bookModel');
+const Book = require('../models/ToBeDeleted-bookModel');
 const factory = require('./handlerFactory');
 
 exports.getAllBooks = factory.getAll(Book);
