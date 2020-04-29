@@ -66,10 +66,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const BasriLogger2 = (req, res) => {
-  console.log('Basri logger (req): ', Object.keys(req));
-};
-
 const BasriUtils = require('./utils/BasriUtils');
 //BASRI - Custom Middleware!
 //Simply logs/lists the keys of the req object :)
