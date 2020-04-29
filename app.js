@@ -1,4 +1,5 @@
 const express = require('express');
+const expressip = require('express-ip');
 const cors = require('cors');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -12,16 +13,12 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
 const userRouter = require('./routes/userRoutes');
+const getIPDetailsRouter = require('./routes/getIPDetailsRoutes');
 // const bookRouter = require('./routes/BACKUP_bookRoutes');
 
 const app = express();
 
-const expressip = require('express-ip');
 app.use(expressip().getIpInfoMiddleware);
-
-// app.get('/', function(req, res) {
-//   res.send(req.ipInfo);
-// });
 
 // 1) GLOBAL MIDDLEWARES
 // Set security HTTP headers
@@ -103,6 +100,7 @@ const corsOptions = {
 app.use(cors());
 // app.use(cors(corsOptions));
 app.options('*', cors());
+app.use('/api/v1/getipdetails', getIPDetailsRouter);
 app.use('/api/v1/users', userRouter);
 // app.use('/api/v1/books', bookRouter);
 

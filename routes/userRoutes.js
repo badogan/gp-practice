@@ -3,11 +3,13 @@ const express = require('express');
 const authController = require('../controllers/authController');
 // const bookController = require('../controllers/bookController');
 const appointmentController = require('../controllers/appointmentController');
+const getIPDetailsController = require('../controllers/getIPDetailsController');
 
 const router = express.Router();
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.get('/getIPDetails', getIPDetailsController.getIPDetails);
 
 router
   .route('/:userId/appointments')
