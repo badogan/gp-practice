@@ -2,8 +2,9 @@ const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const User = require('../models/userModel.js');
+const Appointment = require('../models/appointmentModel.js');
 
-exports.deleteOne = Model =>
+exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const query = await Model.findById(req.params.appointmentId);
 
@@ -11,8 +12,8 @@ exports.deleteOne = Model =>
       return next(
         new AppError(
           'No document found with that ID (may be there is, but not yours)',
-          404
-        )
+          404,
+        ),
       );
     }
 
@@ -24,11 +25,11 @@ exports.deleteOne = Model =>
 
     res.status(204).json({
       status: 'success',
-      data: null
+      data: null,
     });
   });
 
-exports.updateOne = Model =>
+exports.updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const query = await Model.findById(req.params.appointmentId);
 
@@ -36,8 +37,8 @@ exports.updateOne = Model =>
       return next(
         new AppError(
           'No document found with that ID (may be there is, but not yours)',
-          404
-        )
+          404,
+        ),
       );
     }
 
@@ -46,8 +47,8 @@ exports.updateOne = Model =>
       req.body,
       {
         new: true,
-        runValidators: true
-      }
+        runValidators: true,
+      },
     );
 
     if (!doc) {
@@ -58,20 +59,20 @@ exports.updateOne = Model =>
     res.status(200).json({
       status: 'success',
       data: {
-        data: doc
-      }
+        data: doc,
+      },
     });
   });
 
-exports.createOne = Model =>
+exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
     if (!req.body.user) req.body.user = req.user; //IMPORTANT */
-    //Reason for the code below: Appointment should only be created if user roles are different 
+    //Reason for the code below: Appointment should only be created if user roles are different
     //Known BUG: Must be a doctor or a user
     const otherPartyObject = await User.findById(req.body.otherParty);
     if (req.body.user.role === otherPartyObject.role) {
       return next(
-        new AppError('Appointment cannot be created for same user type', 404)
+        new AppError('Appointment cannot be created for same user type', 404),
       );
     }
     //
@@ -80,7 +81,7 @@ exports.createOne = Model =>
 
     res.status(201).json({
       status: 'success',
-      data: newDoc
+      data: newDoc,
     });
   });
 
@@ -92,8 +93,8 @@ exports.getOne = (Model, populateOptions) =>
       return next(
         new AppError(
           'No document found with that ID (may be there is, but not yours)',
-          404
-        )
+          404,
+        ),
       );
     }
 
@@ -109,11 +110,11 @@ exports.getOne = (Model, populateOptions) =>
 
     res.status(200).json({
       status: 'success',
-      data: doc
+      data: doc,
     });
   });
 
-exports.getAll = Model =>
+exports.getAll = (Model) =>
   catchAsync(async (req, res, next) => {
     //   To allow for nested GEt reviews
     const filter = { user: req.user };
@@ -130,7 +131,7 @@ exports.getAll = Model =>
       status: 'success',
       results: docs.length,
       data: {
-        data: docs
-      }
+        data: docs,
+      },
     });
   });

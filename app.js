@@ -16,6 +16,13 @@ const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
+const expressip = require('express-ip');
+app.use(expressip().getIpInfoMiddleware);
+
+// app.get('/', function(req, res) {
+//   res.send(req.ipInfo);
+// });
+
 // 1) GLOBAL MIDDLEWARES
 // Set security HTTP headers
 // app.use(helmet());
@@ -65,10 +72,6 @@ app.use((req, res, next) => {
   // console.log(req.headers);
   next();
 });
-
-const BasriLogger2 = (req, res) => {
-  console.log('Basri logger (req): ', Object.keys(req));
-};
 
 const BasriUtils = require('./utils/BasriUtils');
 //BASRI - Custom Middleware!
