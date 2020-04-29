@@ -5,29 +5,29 @@ const appointmentSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false
+      select: false,
     },
     appDate: {
       type: Date,
-      default: Date.now()
+      default: Date.now(),
       // required: [true, 'Appointment date cannot be empty'],
     },
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User'
+      ref: 'User',
     },
     otherParty: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User'
-    }
+      ref: 'User',
+    },
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  }
+    toObject: { virtuals: true },
+  },
 );
 
-appointmentSchema.pre(/^find/, next => {
+appointmentSchema.pre(/^find/, (next) => {
   //   this.populate({
   //     path: 'tour',
   //     select: '-__v'

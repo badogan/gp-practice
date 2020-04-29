@@ -16,6 +16,13 @@ const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
+const expressip = require('express-ip');
+app.use(expressip().getIpInfoMiddleware);
+
+// app.get('/', function(req, res) {
+//   res.send(req.ipInfo);
+// });
+
 // 1) GLOBAL MIDDLEWARES
 // Set security HTTP headers
 // app.use(helmet());
