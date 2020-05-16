@@ -15,6 +15,7 @@
   },
   "rules": {
     // "prettier/prettier": "error",
+    "comma-dangle": "off",
     "spaced-comment": "off",
     "no-console": "off",
     "consistent-return": "off",

@@ -1,6 +1,11 @@
+const Queue = require('bull');
+
+const sendQueue = new Queue('HardWork1');
+
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Existence = require('../models/existenceModel');
+const JobQueue = require('../models/jobQueueModel');
 
 exports.bringQ1Results = () =>
   catchAsync(async (req, res, next) => {
@@ -20,13 +25,14 @@ exports.bringQ1Results = () =>
       }
     ];
 
-    const result = await (async () => await Existence.aggregate(aggObj))();
+    const rawResult = await (async () => await Existence.aggregate(aggObj))();
+
+    sendQueue.add({ targetIds: rawResult.map(obj => obj._id) });
 
     res.status(200).json({
       status: 'success',
       data: {
-        length: result.length,
-        data: result
+        refId: "Temp success data"
       }
     });
   });
