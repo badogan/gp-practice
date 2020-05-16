@@ -14,6 +14,7 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const userRouter = require('./routes/userRoutes');
 const getIPDetailsRouter = require('./routes/getIPDetailsRoutes');
+const existenceRouter = require('./routes/existenceRoutes');
 // const bookRouter = require('./routes/BACKUP_bookRoutes');
 
 const app = express();
@@ -101,6 +102,7 @@ app.use(cors());
 // app.use(cors(corsOptions));
 app.options('*', cors());
 app.use('/api/v1/getipdetails', getIPDetailsRouter);
+app.use('/api/v1/existence', existenceRouter);
 app.use('/api/v1/users', userRouter);
 // app.use('/api/v1/books', bookRouter);
 
