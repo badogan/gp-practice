@@ -3,12 +3,16 @@ const mongoose = require('mongoose');
 const jobQueueSchema = new mongoose.Schema(
   {
     createdAt: {
-      type: Date,
-      default: Date.now(),
-      select: false
+      type: Date
     },
-    data: {
+    searchRequest: {
       type: Object
+    },
+    searchResult: {
+      type: Array
+    },
+    completedAt: {
+      type: Date
     }
   },
   {

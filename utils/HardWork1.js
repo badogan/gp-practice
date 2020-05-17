@@ -5,7 +5,8 @@ dotenv.config({ path: '../config.env' });
 const moment = require('moment');
 const Queue = require('bull');
 const receiveQueue = new Queue('HardWork1');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
+const JobQueue = require('../models/jobQueueModel');
 
 process.on('uncaughtException', err => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -23,10 +24,20 @@ const DB = process.env.DATABASE.replace(
 receiveQueue.process(async (job, done) => {
   const client = new MongoClient(DB);
   try {
-    const resultPart1 = formAggregationObject(job.data.rawResult[0]);
     await client.connect();
-    const result = await bringAggregationResult(client, resultPart1);
-    console.log('THE RESULT:', result);
+    const resultsAll = await Promise.all(
+      job.data.rawResult.map(doc =>
+        taskRunner(bringAggregationResult, formAggregationObject)(doc, client)
+      )
+    );
+    // console.log('ALL THE RESULT:', resultsAll);
+    const searchResult = [...new Set(resultsAll.flat())];
+    await updateJobQueue({
+      client,
+      refId: job.data.refId,
+      searchResult
+    });
+    console.log('Completed. JobQueue _id: ', job.data.refId);
   } catch (err) {
     console.log(err);
   } finally {
@@ -36,18 +47,28 @@ receiveQueue.process(async (job, done) => {
   done();
 });
 
-async function bringAggregationResult(client, formedObj) {
+async function updateJobQueue({ client, refId, searchResult }) {
+  await client
+    .db('gp-practice')
+    .collection('jobqueues')
+    .updateOne(
+      { _id: new ObjectID(refId) },
+      { $set: { searchResult, completedAt: moment().toISOString() } }
+    );
+}
+
+async function bringAggregationResult({ client, formedObj }) {
   const aggregateCursor = await client
     .db('gp-practice')
     .collection('existences')
     .aggregate(formedObj);
 
   const result = [];
-  await aggregateCursor.forEach(one => result.push(`${one.eMAC}`));
+  await aggregateCursor.forEach(one => result.push(`${one._id}`));
   return result;
 }
 
-const formAggregationObject = obj => {
+const formAggregationObject = (obj, client) => {
   const [longitude, latitude] = obj.location.coordinates;
   const dateLowerBoundary = moment(new Date(obj.eTimestamp))
     .subtract(2, 'hours')
@@ -56,7 +77,7 @@ const formAggregationObject = obj => {
     .add(2, 'hours')
     ._d.toISOString();
 
-  const aggObj = [
+  const formedObj = [
     {
       $geoNear: {
         near: {
@@ -78,5 +99,5 @@ const formAggregationObject = obj => {
       }
     }
   ];
-  return aggObj;
+  return { client, formedObj };
 };

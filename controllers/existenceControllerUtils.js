@@ -1,5 +1,5 @@
 const Queue = require('bull');
-
+const moment = require('moment');
 const sendQueue = new Queue('HardWork1');
 
 const catchAsync = require('../utils/catchAsync');
@@ -14,6 +14,11 @@ exports.bringQ1Results = () =>
       return next(new AppError('Q1 query details not available', 400));
     }
 
+    const newJobQueueDoc = await JobQueue.create({
+      searchRequest: req.body,
+      createdAt: moment().toISOString()
+    });
+    console.log('Started. JobQueue _id: ', newJobQueueDoc._id);
     const aggObj = [
       {
         $match: {
@@ -27,16 +32,16 @@ exports.bringQ1Results = () =>
 
     const rawResult = await (async () => await Existence.aggregate(aggObj))();
 
-    sendQueue.add({ rawResult});
+    sendQueue.add({ rawResult, refId: newJobQueueDoc._id });
 
     res.status(200).json({
       status: 'success',
       data: {
-        refId: "Temp success data"
+        refId: newJobQueueDoc._id
       }
     });
   });
-
+//TODO Remove bringQ2Results - not used anymore. Don't forget to remove route as well
 exports.bringQ2Results = () =>
   catchAsync(async (req, res, next) => {
     if (!Object.keys(req.body)) {
