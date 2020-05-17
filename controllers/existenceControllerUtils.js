@@ -27,7 +27,7 @@ exports.bringQ1Results = () =>
 
     const rawResult = await (async () => await Existence.aggregate(aggObj))();
 
-    sendQueue.add({ targetIds: rawResult.map(obj => obj._id) });
+    sendQueue.add({ rawResult});
 
     res.status(200).json({
       status: 'success',

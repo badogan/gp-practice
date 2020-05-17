@@ -1,12 +1,11 @@
-const Queue = require('bull');
-const moment = require('moment');
-
-const receiveQueue = new Queue('HardWork1');
-
-const mongoose = require('mongoose');
+/* eslint-disable arrow-parens */
+/* eslint-disable no-use-before-define */
 const dotenv = require('dotenv');
-
-const Existence = require('../models/existenceModel');
+dotenv.config({ path: '../config.env' });
+const moment = require('moment');
+const Queue = require('bull');
+const receiveQueue = new Queue('HardWork1');
+const { MongoClient } = require('mongodb');
 
 process.on('uncaughtException', err => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -14,66 +13,70 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-dotenv.config({ path: '../config.env' });
-
+const compose = (f, g) => (...args) => f(g(...args));
+const taskRunner = (...fns) => fns.reduce(compose);
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
 );
 
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-  })
-  .then(() => console.log('HardWork1 - DB connection successful!'));
-
-const executeForOne = async id => {
+receiveQueue.process(async (job, done) => {
+  const client = new MongoClient(DB);
   try {
-    const targetDoc = await Existence.findById(id);
-    // console.log('targetDoc: ', targetDoc);
-    const dateLowerBoundary = moment(new Date(targetDoc.eTimestamp))
-      .subtract(2, 'hours')
-      ._d.toISOString();
-    const dateUpperBoundary = moment(new Date(targetDoc.eTimestamp))
-      .add(2, 'hours')
-      ._d.toISOString();
-    const aggObj = [
-      {
-        $near: {
-          near: [targetDoc.location.longitude, targetDoc.location.latitude],
-          distanceField: 'dist.calculated',
-          maxDistance: 10, //TODO
-          key: 'location'
-        }
-      },
-      {
-        $match: {
-          eTimestamp: {
-            $lte: dateUpperBoundary,
-            $gte: dateLowerBoundary
-          }
-        }
-      }
-    ];
-    // const result = await (async () => await Existence.aggregate(aggObj))();
-    const result = await Existence.aggregate(aggObj);
-    //   return Existence.aggregate(aggObj);
-    return result;
+    const resultPart1 = formAggregationObject(job.data.rawResult[0]);
+    await client.connect();
+    const result = await bringAggregationResult(client, resultPart1);
+    console.log('THE RESULT:', result);
   } catch (err) {
-    console.log('ExecuteOne Related Error:', err);
+    console.log(err);
+  } finally {
+    await client.close();
   }
-};
-
-receiveQueue.process((job, done) => {
-  console.log('Received message', job.data.targetIds);
-
-  Promise.all(job.data.targetIds.map(id => executeForOne(id))).then(res =>
-    console.log(res)
-  );
-
-  //   console.log('result: ', result);
 
   done();
 });
+
+async function bringAggregationResult(client, formedObj) {
+  const aggregateCursor = await client
+    .db('gp-practice')
+    .collection('existences')
+    .aggregate(formedObj);
+
+  const result = [];
+  await aggregateCursor.forEach(one => result.push(`${one.eMAC}`));
+  return result;
+}
+
+const formAggregationObject = obj => {
+  const [longitude, latitude] = obj.location.coordinates;
+  const dateLowerBoundary = moment(new Date(obj.eTimestamp))
+    .subtract(2, 'hours')
+    ._d.toISOString();
+  const dateUpperBoundary = moment(new Date(obj.eTimestamp))
+    .add(2, 'hours')
+    ._d.toISOString();
+
+  const aggObj = [
+    {
+      $geoNear: {
+        near: {
+          type: obj.location.type,
+          coordinates: [longitude, latitude]
+        },
+        distanceField: 'dist.calculated',
+        maxDistance: 10, //TODO Hardcoded for now
+        spherical: true,
+        key: 'location'
+      }
+    },
+    {
+      $match: {
+        eTimestamp: {
+          $lte: new Date(dateUpperBoundary),
+          $gte: new Date(dateLowerBoundary)
+        }
+      }
+    }
+  ];
+  return aggObj;
+};
