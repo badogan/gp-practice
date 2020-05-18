@@ -16,6 +16,9 @@ const existenceSchema = new mongoose.Schema(
       type: String
       //   unique: true,
     },
+    cartesianLocation: {
+      type: Array
+    },
     location: {
       coordinates: {
         type: Array,

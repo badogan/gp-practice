@@ -85,8 +85,8 @@ const formAggregationObject = (obj, client) => {
           coordinates: [longitude, latitude]
         },
         distanceField: 'dist.calculated',
-        maxDistance: 10, //TODO Hardcoded for now
-        spherical: true,
+        maxDistance: 40, //TODO Hardcoded for now
+        // spherical: true,
         key: 'location'
       }
     },
