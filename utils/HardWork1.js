@@ -22,13 +22,18 @@ const DB = process.env.DATABASE.replace(
 );
 
 receiveQueue.process(async (job, done) => {
+  const maxDistance = job.data.maxDistance;
   const client = new MongoClient(DB);
   try {
     await client.connect();
     const resultsAll = await Promise.all(
-      job.data.rawResult.map(doc =>
-        taskRunner(bringAggregationResult, formAggregationObject)(doc, client)
-      )
+      job.data.rawResult.map(doc => {
+        doc.maxDistance = maxDistance;
+        return taskRunner(bringAggregationResult, formAggregationObject)(
+          doc,
+          client
+        );
+      })
     );
     // console.log('ALL THE RESULT:', resultsAll);
     const searchResult = [...new Set(resultsAll.flat())];
@@ -85,7 +90,8 @@ const formAggregationObject = (obj, client) => {
           coordinates: [longitude, latitude]
         },
         distanceField: 'dist.calculated',
-        maxDistance: 30, //TODO Hardcoded for now
+        // maxDistance: 40,
+        maxDistance: obj.maxDistance,
         // spherical: true,
         key: 'location'
       }

@@ -3,6 +3,7 @@
 ## Current State
 /{{URL}}api/v1/existence/newexistence
 A new existence object can be added to a collection.
+It accepts cartesian coordinates and coverts it to a GeoJSON with an offset longitude and latitude
 Location property is GeoJSON (currently, Point)
 
 {{URL}}api/v1/existence/q1results
@@ -12,19 +13,9 @@ Description. (1) Uses MongoDB aggregation thru NodeJS controller code and Mongoo
 @param  {timestamp, ISO}    eTimestamp  Starting Date (ISO - so can go to a second if needed)
 @return {array of documents}
 
-{{URL}}api/v1/existence/q2results
-Summary. Identify and filter target documents that fall within a proximity (maxDistance) and a date range
-Description. (1)
-@param  {number}    longitude    longitude
-@param  {number}    latitude    latitude
-@param  {number}    maxDistance    maximum proximity in meters
-@param  {timestamp, ISO}    startDate  Starting Date (ISO) for the targeted date range
-@param  {timestamp, ISO}    endDate  End Date (ISO) for the targeted date range
-@return {array of documents}
-
-TODO: (Dev) Put q1 and q2 queries together and return the list of MACs the "target MAC" had contacted with
+TODO: Accept maxDistance as a query parameter
 TODO: (Dev) Prepare a basic entry form and put FE infra in place (React, Redux, ReactRouter, Page + Component structure with initial API wiring)
-TODO: (Research) what is used for queue/task management in the market (especially the ones I am interested with (@TOLGA What do you use?))
+TODO: (InProgress) - Redis introduced. Management of different queues handled by different Nodejs instances. (Research) what is used for queue/task management in the market (especially the ones I am interested with (@TOLGA What do you use?))
 TODO: (Think) Move to TS on backend code? Write tests and deploy as well?
 
 ## Brainstorming - Potential Next Tasks
