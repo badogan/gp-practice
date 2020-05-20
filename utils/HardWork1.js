@@ -81,7 +81,7 @@ const formAggregationObject = (obj, client) => {
     .subtract(1, 'minutes')
     ._d.toISOString();
   const dateUpperBoundary = moment(new Date(obj.eTimestamp))
-    .add(10, 'minutes')
+    .add(1, 'minutes')
     ._d.toISOString();
 
   const formedObj = [

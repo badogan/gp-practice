@@ -86,32 +86,29 @@ exports.createExistence = () =>
 exports.bringJobQueueResults = () =>
   catchAsync(async (req, res, next) => {
     const doc = await JobQueue.findById(req.body.jobQueueId);
-    // console.log('doc:', doc.searchResult);
-    const involvedListArray = await doc.searchResult.map(async id => {
-      const X = await Existence.findById(id);
-      console.log(X.eMAC);
-      // return await X.eMAC;
-    });
-    console.log('involvedList array: ', involvedListArray);
-
-    // const X = await doc.searchResult.map(id => Existence.findById(id));
-    // console.log('FIFTH:', X[5]);
-    // await X.forEach(item => involvedListArray.push(`${item.eMAC}`));
-    // console.log('involvedList Array', involvedListArray);
-    // let targetId = doc.searchResult[0];
-    // const targetObj = await Existence.findById(targetId);
-    // involvedList.push(targetObj.eMAC);
-    // console.log('involvedList array: ', involvedList);
-
-    // const involvedEMACList = await doc.searchResult
-    //   .map(id => {
-    //     Existence.findById(id);
-    //   })
-    //   // .map(obj => obj.eMAC);
-    // console.log('involvedEMACList: ', involvedEMACList);
-    // const uniqueList = [...new Set(involvedEMACList)];
-    res.status(201).json({
-      status: 'success',
-      data: { involvedListArray }
-    });
+    if (doc && !doc.completedAt) {
+      res.status(201).json({
+        status: 'success',
+        data: { message: 'Reference JobQueue still in progress' }
+      });
+    } else {
+      const iterateThis = doc.searchResult;
+      let involvedListArray = [];
+      while (iterateThis.length > 0) {
+        const targetItem = iterateThis.pop();
+        console.log('targetItem:', targetItem);
+        const result = await testing(targetItem);
+        involvedListArray.push(result);
+      }
+      const uniqueList = [...new Set(involvedListArray)];
+      res.status(201).json({
+        status: 'success',
+        data: { count: uniqueList.length, uniqueList }
+      });
+    }
   });
+
+async function testing(oneItem) {
+  const result = await Existence.findById(oneItem);
+  return result.eMAC;
+}
