@@ -97,7 +97,7 @@ exports.bringJobQueueResults = () =>
       while (iterateThis.length > 0) {
         const targetItem = iterateThis.pop();
         console.log('targetItem:', targetItem);
-        const result = await testing(targetItem);
+        const result = await getEMAC(targetItem);
         involvedListArray.push(result);
       }
       const uniqueList = [...new Set(involvedListArray)];
@@ -108,7 +108,7 @@ exports.bringJobQueueResults = () =>
     }
   });
 
-async function testing(oneItem) {
+async function getEMAC(oneItem) {
   const result = await Existence.findById(oneItem);
   return result.eMAC;
 }
