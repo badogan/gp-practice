@@ -37,6 +37,8 @@ receiveQueue.process(async (job, done) => {
     );
     // console.log('ALL THE RESULT:', resultsAll);
     const searchResult = [...new Set(resultsAll.flat())];
+    //ListInvolvedParties
+    //
     await updateJobQueue({
       client,
       refId: job.data.refId,
@@ -76,10 +78,10 @@ async function bringAggregationResult({ client, formedObj }) {
 const formAggregationObject = (obj, client) => {
   const [longitude, latitude] = obj.location.coordinates;
   const dateLowerBoundary = moment(new Date(obj.eTimestamp))
-    .subtract(2, 'hours')
+    .subtract(1, 'minutes')
     ._d.toISOString();
   const dateUpperBoundary = moment(new Date(obj.eTimestamp))
-    .add(2, 'hours')
+    .add(10, 'minutes')
     ._d.toISOString();
 
   const formedObj = [

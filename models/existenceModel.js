@@ -7,6 +7,10 @@ const existenceSchema = new mongoose.Schema(
       default: Date.now(),
       select: false
     },
+    eOID: {
+      type: String
+      //   unique: true,
+    },
     eTimestamp: {
       type: Date,
       default: Date.now()

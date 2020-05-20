@@ -1,7 +1,7 @@
 [
   {
     "eTimestamp": "2020-01-29T11:37:12.548Z",
-    "eMAC": "Test MAC1000",
+    "eMAC": "XXXXXTest MAC1000",
     "location": {
       "coordinates": [100, 100],
       "type": "Point"
@@ -9,7 +9,7 @@
   },
   {
     "eTimestamp": "2020-01-29T11:37:12.548Z",
-    "eMAC": "Test MAC1001",
+    "eMAC": "YYYYTest MAC1001",
     "location": {
       "coordinates": [115, 120],
       "type": "Point"
@@ -17,7 +17,7 @@
   },
   {
     "eTimestamp": "2020-01-29T11:37:12.548Z",
-    "eMAC": "Test MAC1002",
+    "eMAC": "ZZZZZTest MAC1002",
     "location": {
       "coordinates": [200, 200],
       "type": "Point"
@@ -25,9 +25,9 @@
   },
   {
     "eTimestamp": "2020-01-29T11:37:12.548Z",
-    "eMAC": "Test MAC1003",
+    "eMAC": "AAAATest MAC1000",
     "location": {
-      "coordinates": [215, 220],
+      "coordinates": [100, 100],
       "type": "Point"
     }
   }

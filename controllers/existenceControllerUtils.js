@@ -11,6 +11,8 @@ const JobQueue = require('../models/jobQueueModel');
 
 const convertor = require('../utils/convertorUtil');
 
+const factory = require('./handlerFactory');
+
 exports.bringQ1Results = () =>
   catchAsync(async (req, res, next) => {
     if (!Object.keys(req.body)) {
@@ -60,6 +62,7 @@ exports.createExistence = () =>
     });
 
     const existenceObj = {
+      eOID: req.body.eOID,
       eTimestamp: req.body.eTimestamp,
       eMAC: req.body.eMAC,
       cartesianLocation: [
@@ -77,5 +80,38 @@ exports.createExistence = () =>
     res.status(201).json({
       status: 'success',
       data: newDoc
+    });
+  });
+
+exports.bringJobQueueResults = () =>
+  catchAsync(async (req, res, next) => {
+    const doc = await JobQueue.findById(req.body.jobQueueId);
+    // console.log('doc:', doc.searchResult);
+    const involvedListArray = await doc.searchResult.map(async id => {
+      const X = await Existence.findById(id);
+      console.log(X.eMAC);
+      // return await X.eMAC;
+    });
+    console.log('involvedList array: ', involvedListArray);
+
+    // const X = await doc.searchResult.map(id => Existence.findById(id));
+    // console.log('FIFTH:', X[5]);
+    // await X.forEach(item => involvedListArray.push(`${item.eMAC}`));
+    // console.log('involvedList Array', involvedListArray);
+    // let targetId = doc.searchResult[0];
+    // const targetObj = await Existence.findById(targetId);
+    // involvedList.push(targetObj.eMAC);
+    // console.log('involvedList array: ', involvedList);
+
+    // const involvedEMACList = await doc.searchResult
+    //   .map(id => {
+    //     Existence.findById(id);
+    //   })
+    //   // .map(obj => obj.eMAC);
+    // console.log('involvedEMACList: ', involvedEMACList);
+    // const uniqueList = [...new Set(involvedEMACList)];
+    res.status(201).json({
+      status: 'success',
+      data: { involvedListArray }
     });
   });
